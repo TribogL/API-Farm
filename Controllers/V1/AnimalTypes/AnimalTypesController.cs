@@ -38,21 +38,49 @@ public class AnimalTypesController : ControllerBase
         }
         return Ok(animalTypes);
     }
-    [HttpGet]
+    [HttpGet("{id}")]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
         var animalType = await Context.AnimalTypes.FindAsync(id);
-        if(animalType == null)
+        if (animalType == null)
         {
             return NoContent();
         }
         return Ok(animalType);
-     }
+    }
+
+    [HttpGet("search/{keyword}")]
+    public async Task<IActionResult> SearchByKeyword([FromRoute] string keyword)
+    {
+        var animalTypes = await Context.AnimalTypes.Where(p => p.Name.Contains(keyword) || p.Description.Contains(keyword)).ToListAsync();
+        if (animalTypes.Any() == false)
+        {
+            return NoContent();
+        }
+        return Ok(animalTypes);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     [HttpPost]
     public async Task<IActionResult> create(AnimalType nuevoAnimalType)
     {
-        if(ModelState.IsValid == false)
+        if (ModelState.IsValid == false)
         {
             return BadRequest(ModelState);
         }
