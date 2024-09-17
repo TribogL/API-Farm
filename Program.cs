@@ -1,4 +1,6 @@
+using API_Farm.Data;
 using DotNetEnv;
+using Microsoft.EntityFrameworkCore;
 
 Env.Load();
 
@@ -8,26 +10,20 @@ var port = Environment.GetEnvironmentVariable("DB_PORT");
 var username = Environment.GetEnvironmentVariable("DB_USERNAME");
 var password = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
-var connetionString =$"server={host};port{port};database={databaseName};uid={username};password{password}";
-
-
-
-
-
-
-
-
-
-
-
+var connetionString = $"server={host};port{port};database={databaseName};uid={username};password{password}";
 
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(connetionString, ServerVersion.Parse("8.0.20-mysql")));
+
 
 builder.Services.AddControllers();
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
