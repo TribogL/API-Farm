@@ -4,21 +4,31 @@ using System.Linq;
 using System.Threading.Tasks;
 using API_Farm.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-namespace API_Farm.Controllers.V1.AnimalTypes
+namespace API_Farm.Controllers.V1.AnimalTypes;
+[ApiController]
+[Route("api/V1/[controller]")]
+public class AnimalTypesController : ControllerBase
 {
-    [ApiController]
-    [Route("api/V1/[controller]")]
-    public class AnimalTypesController : ControllerBase
+    private readonly ApplicationDbContext Context;
+
+    public AnimalTypesController(ApplicationDbContext context)
     {
-        private readonly ApplicationDbContext Context;
+        Context = context;
+    }
 
-        public AnimalTypesController(ApplicationDbContext context)
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var animalTypes = await Context.AnimalTypes.ToListAsync();
+
+        if (animalTypes.Any() == false)
         {
-            Context = context;
+            return NoContent();
         }
-        
-
+        return Ok(animalTypes);
     }
 
 }
+
