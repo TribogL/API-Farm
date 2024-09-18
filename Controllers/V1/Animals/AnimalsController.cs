@@ -8,14 +8,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace API_Farm.Controllers.V1.AnimalTypes;
+namespace API_Farm.Controllers.V1.Animals;
+
 [ApiController]
-[Route("api/V1/[controller]")]
-public class AnimalTypesController : ControllerBase
+[Route("api/[controller]")]
+public class AnimalsController : ControllerBase
 {
     private readonly ApplicationDbContext Context;
 
-    public AnimalTypesController(ApplicationDbContext context)
+    public AnimalsController(ApplicationDbContext context)
     {
         Context = context;
     }
@@ -25,58 +26,58 @@ public class AnimalTypesController : ControllerBase
         Summary = "Retrieves all animal types",
         Description = "Gets a list of all animal types in the database."
     )]
-    [SwaggerResponse(200, "Returns a list of animal types.", typeof(IEnumerable<AnimalType>))]
+    [SwaggerResponse(200, "Returns a list of animal types.", typeof(IEnumerable<Animal>))]
     [SwaggerResponse(204, "There are no registered animal types.")]
     [SwaggerResponse(500, "An internal server error occurred.")]
     public async Task<IActionResult> GetAll()
     {
-        var animalTypes = await Context.AnimalTypes.ToListAsync();
+        var Animals = await Context.Animals.ToListAsync();
 
-        if (animalTypes.Any() == false)
+        if (Animals.Any() == false)
         {
             return NoContent();
         }
-        return Ok(animalTypes);
+        return Ok(Animals);
     }
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
-        var animalType = await Context.AnimalTypes.FindAsync(id);
-        if (animalType == null)
+        var Animal = await Context.Animals.FindAsync(id);
+        if (Animal == null)
         {
             return NoContent();
         }
-        return Ok(animalType);
+        return Ok(Animal);
     }
 
 
     [HttpGet("search/{keyword}")]
     public async Task<IActionResult> SearchByKeyword([FromRoute] string keyword)
     {
-        var animalTypes = await Context.AnimalTypes.Where(p => p.Name.Contains(keyword) || p.Description.Contains(keyword)).ToListAsync();
-        if (animalTypes.Any() == false)
+        var Animals = await Context.Animals.Where(p => p.Name.Contains(keyword) || p.Description.Contains(keyword)).ToListAsync();
+        if (Animals.Any() == false)
         {
             return NoContent();
         }
-        return Ok(animalTypes);
+        return Ok(Animals);
     }
 
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] AnimalType updatedAnimalType)
+    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] Animal updatedAnimal)
     {
-        var animalType = checkExistence(id);
-        if (animalType == false)
+        var Animal = checkExistence(id);
+        if (Animal == false)
         {
             return NoContent();
         }
-        updatedAnimalType.Id = id;
+        updatedAnimal.Id = id;
         if (ModelState.IsValid == false)
         {
             return BadRequest(ModelState);
         }
 
-        Context.Entry(updatedAnimalType).State = EntityState.Modified;
+        Context.Entry(updatedAnimal).State = EntityState.Modified;
         await Context.SaveChangesAsync();
         return Ok("updated");
     }
@@ -84,30 +85,29 @@ public class AnimalTypesController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
-        var animalType = checkExistence(id);
-        if (animalType == false)
+        var Animal = checkExistence(id);
+        if (Animal == false)
         {
             return NoContent();
         }
-        Context.AnimalTypes.Remove(await Context.AnimalTypes.FindAsync(id));
+        Context.Animals.Remove(await Context.Animals.FindAsync(id));
         await Context.SaveChangesAsync();
         return Ok("deleted");
     }
     private bool checkExistence(int id)
     {
-        return Context.AnimalTypes.Any(p => p.Id == id);
+        return Context.Animals.Any(p => p.Id == id);
     }
     
     [HttpPost]
-    public async Task<IActionResult> create(AnimalType nuevoAnimalType)
+    public async Task<IActionResult> create(Animal nuevoAnimal)
     {
         if (ModelState.IsValid == false)
         {
             return BadRequest(ModelState);
         }
-        Context.AnimalTypes.Add(nuevoAnimalType);
+        Context.Animals.Add(nuevoAnimal);
         await Context.SaveChangesAsync();
         return Ok("Se creo el tipo de animal");
     }
 }
-
