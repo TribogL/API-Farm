@@ -49,6 +49,7 @@ public class AnimalTypesController : ControllerBase
         return Ok(animalType);
     }
 
+
     [HttpGet("search/{keyword}")]
     public async Task<IActionResult> SearchByKeyword([FromRoute] string keyword)
     {
@@ -60,43 +61,42 @@ public class AnimalTypesController : ControllerBase
         return Ok(animalTypes);
     }
 
+
     [HttpPut("{id}")]
     public async Task<IActionResult> Update([FromRoute] int id, [FromBody] AnimalType updatedAnimalType)
     {
-        var animalType = ChechExistence(id);
+        var animalType = checkExistence(id);
         if (animalType == false)
         {
             return NoContent();
         }
-
         updatedAnimalType.Id = id;
         if (ModelState.IsValid == false)
         {
             return BadRequest(ModelState);
         }
 
+        Context.Entry(updatedAnimalType).State = EntityState.Modified;
+        await Context.SaveChangesAsync();
+        return Ok("updated");
+    }
 
-        // try
-        // {
-
-        //     Context.Entry(updatedAnimalType).State = EntityState.Modified;
-        //     await Context.SaveChangesAsync();
-        //     return Ok("updated");
-        // }
-        // catch (Exception ex)
-        // {
-        //     Console.WriteLine(ex.Message);
-        //     throw;
-        // }
-
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        var animalType = checkExistence(id);
+        if (animalType == false)
+        {
+            return NoContent();
         }
-
-    private bool ChechExistence(int id)
+        Context.AnimalTypes.Remove(await Context.AnimalTypes.FindAsync(id));
+        await Context.SaveChangesAsync();
+        return Ok("deleted");
+    }
+    private bool checkExistence(int id)
     {
         return Context.AnimalTypes.Any(p => p.Id == id);
     }
-
-
 
 
 
