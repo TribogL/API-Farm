@@ -11,7 +11,7 @@ var port = Environment.GetEnvironmentVariable("DB_PORT");
 var username = Environment.GetEnvironmentVariable("DB_USERNAME");
 var password = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
-var connetionString = $"server={host};port{port};database={databaseName};uid={username};password{password}";
+var connectionString = $"server={host};port={port};database={databaseName};uid={username};password={password}";
 
 
 
@@ -19,7 +19,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(connetionString, ServerVersion.Parse("8.0.20-mysql")));
+    options.UseMySql(connectionString, ServerVersion.Parse("8.0.20-mysql")));
+    
 
 
 builder.Services.AddControllers();
