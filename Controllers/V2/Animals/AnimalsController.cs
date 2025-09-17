@@ -84,7 +84,7 @@ public class AnimalsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update([FromRoute] int id, [FromBody] Animal updatedanimal)
     {
-        var animal = checkExistence(id);
+        var animal = CheckExistence(id);
         if (animal == false)
         {
             return NoContent();
@@ -104,7 +104,7 @@ public class AnimalsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
-        var animal = checkExistence(id);
+        var animal = CheckExistence(id);
         if (animal == false)
         {
             return NoContent();
@@ -115,7 +115,7 @@ public class AnimalsController : ControllerBase
     }
 
 
-    private bool checkExistence(int id)
+    private bool CheckExistence(int id)
     {
         return Context.Animals.Any(p => p.Id == id);
     }
